@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8" />
+	<title>로또생성기 v1.0</title>
+	<style>
+		* { margin: 0; padding: 0; }
+		a { text-decoration: none; }
+		ul, ol { list-style: none; }
+		select { min-width: 70px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; box-shadow: 0 0 3px 0 #e7eaec; }
+		select option { font-size: 15px; }
+		button { min-width: 60px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; background: #f8f8fb; box-shadow: 0 0 3px 0 #e7eaec; }
+		
+		#container { max-width: 400px; padding: 20px; }
+		
+		.select_box { text-align: center; padding: 10px 15px; border: 2px solid #e7eaec; }
+		.select_box .title { display: inline-block; vertical-align: middle; font-size: 16px; font-weight: bolder; color: #666; margin-right: 10px; }
+		
+		.view_list { padding: 10px 0; }
+		.view_list > li { text-align: center; padding: 10px 0; border-bottom: 1px solid #e7eaec; }
+		.view_list > li span { width: 40px; height: 40px; display: inline-block; vertical-align: middle; text-align: center; font-size: 16px; font-weight: bolder; color: #333; line-height: 40px; margin: 2px; border: 3px solid; border-radius: 100%; }
+		.view_list > li span.yellow { border-color: #ffb400; }
+		.view_list > li span.blue { border-color: #1E90FF; }
+		.view_list > li span.red { border-color: #FF5675; }
+		.view_list > li span.black{ border-color: #828282; }
+		.view_list > li span.green { border-color: #64CD3C; }
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div class="select_box">
+			<span class="title">몇개를 만들까요?</span>
+			<select name="" id="selector">
+				<option value="0" selected>수량</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+			</select>
+			<button class="btn_refresh" onclick="refresh();">초기화</button>
+		</div>
+		<ul class="view_list">
+		</ul>
+	</div>
+	
+	
+	
+	<div></div>
+	<div></div>
+	<div></div>
+	<script>
+		const lotto = {
+			min: 1,
+			max: 45,
+			nums: [],
+			pick: 6,
+			multiPicks: [],
+			setter: function() {
+				for ( i=0; i<this.max; i++ ) {
+					this.nums[i] = i + 1;
+					
+				}
+			},
+			picker: function(repeat) {
+				this.setter();
+				var nums = this.nums;
+				var numBoard = nums;
+				var pickNum;
+				var picks = [];
+				var multiPicks = [];
+				for( rep=0; rep<repeat; rep++ ) {
+					this.setter();
+					for( i=0; i<this.pick; i++ ) {
+						while( isNaN(numBoard[pickNum]) || numBoard[pickNum] == 0 ) {
+							pickNum = parseInt(Math.random() * this.max);
+						}
+						picks[i] = numBoard[pickNum];
+						numBoard.splice(pickNum, 1, 0);
+						picks.sort(function(a, b) {
+							return a - b;
+						});
+						pickNum = null;
+					}
+					numBoard = nums;
+					multiPicks[rep] = picks;
+					picks = [];
+				}
+				this.multiPicks = multiPicks;
+			}
+		}
+
+		document.querySelector('#selector').addEventListener('change', function() {
+			var thisValue = this.value;
+			var items = "";
+			lotto.picker(thisValue);
+
+			for( numSet=0; numSet<lotto.multiPicks.length; numSet++ ) {
+				items +='<li>';
+				for( numData=0; numData<lotto.multiPicks[numSet].length; numData++ ) {
+					var thisNum = lotto.multiPicks[numSet][numData];
+					if ( thisNum > 0 && thisNum <= 10 ) {
+						items += "<span class='yellow'>"+thisNum+"</span>";
+					} else if ( thisNum > 10 && thisNum <=20 ) {
+						items += "<span class='blue'>"+thisNum+"</span>";
+					} else if ( thisNum > 20 && thisNum <=30 ) {
+						items += "<span class='red'>"+thisNum+"</span>";
+					} else if ( thisNum > 30 && thisNum <=40 ) {
+						items += "<span class='black'>"+thisNum+"</span>";
+					} else if ( thisNum > 40 && thisNum <=45 ) {
+						items += "<span class='green'>"+thisNum+"</span>";
+					}
+					
+					document.querySelector('.view_list').innerHTML=items;
+				}
+				items +='</li>';
+			}
+			
+		});
+		
+		function refresh() {
+			location.reload(true);
+		}
+	</script>
+	
+</body>
+</html>
