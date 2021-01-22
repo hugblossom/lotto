@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8" />
+	<title>로또생성기 v1.0</title>
+	<style>
+		* { margin: 0; padding: 0; }
+		a { text-decoration: none; }
+		ul, ol { list-style: none; }
+		select { min-width: 70px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; box-shadow: 0 0 3px 0 #e7eaec; }
+		select option { font-size: 15px; }
+		button { min-width: 60px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; background: #f8f8fb; box-shadow: 0 0 3px 0 #e7eaec; }
+		
+		#container { max-width: 400px; padding: 20px; }
+		
+		.select_box { text-align: center; padding: 10px 15px; border: 2px solid #e7eaec; }
+		.select_box .title { display: inline-block; vertical-align: middle; font-size: 16px; font-weight: bolder; color: #666; margin-right: 10px; }
+		
+		.view_list { padding: 10px 0; }
+		.view_list > li { text-align: center; padding: 10px 0; border-bottom: 1px solid #e7eaec; }
+		.view_list > li span { width: 40px; height: 40px; display: inline-block; vertical-align: middle; text-align: center; font-size: 16px; font-weight: bolder; color: #333; line-height: 40px; margin: 2px; border: 3px solid; border-radius: 100%; }
+		.view_list > li span.yellow { border-color: #ffb400; }
+		.view_list > li span.blue { border-color: #1E90FF; }
+		.view_list > li span.red { border-color: #FF5675; }
+		.view_list > li span.black{ border-color: #828282; }
+		.view_list > li span.green { border-color: #64CD3C; }
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div class="select_box">
+			<span class="title">몇개를 만들까요?</span>
+			<select name="" id="selector">
+				<option value="0" selected>수량</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+			</select>
+			<button class="btn_refresh" onclick="refresh();">초기화</button>
+		</div>
+		<ul class="view_list">
+        </ul>
+	</div>
+	<script>
+
+        var Lotto = function(games, min, max, numbers) {
+            this.games  = games;    // game count
+            this.min    = min;      // min number
+            this.max    = max;      // max number
+            this.numbers= numbers;  // pick count
+            this.init   = function() {
+                var scopeArr = new Array();
+                
+                for (var i = min; i <= max; i++) {
+                    scopeArr.push(i);
+                }
+
+                return scopeArr;
+            };
+            this.pick   = function() {
+                var pickArray = new Array();
+                for (var i = 0; i < this.games; i++) {
+                    var resultArr   = new Array();
+                    var scopeArr    = this.init();
+
+                    for (var j = 0; j < this.numbers; j++) {
+                        var idx = Math.floor(Math.random() * scopeArr.length);
+                        var splice = scopeArr.splice(idx, 1)[0];
+                        console.log("idx: " + idx + " / splice: " + splice);
+                        resultArr.push(splice);
+                    }
+                    resultArr.sort(function(a, b) {
+                        return a - b
+                    });
+                    pickArray.push(resultArr);
+                }
+
+                return pickArray;
+            };
+            this.print  = function(pickArray) {
+                var elm = document.createElement("div");
+                elm.id = "result";
+                document.body.appendChild(elm);
+
+                for (var i = 0; i < pickArray.length; i++) {
+                    console.log(pickArray[i]);
+                    for (var j = 0; j < pickArray[i].length; j++) {
+                        var span = document.createElement("span");
+                        span.style.display = "inline-block";
+                        span.style.width = "50px";
+                        span.style.lineHeight = "50px";
+                        span.style.textAlign = "center";
+                        span.innerText = pickArray[i][j];
+                        elm.appendChild(span);
+                    }
+                    var br = document.createElement("br");
+                    elm.appendChild(br);
+                }
+            };
+            this.play   = function() {
+                this.print(this.pick());
+            };
+        }
+
+        var notto = new Lotto(10, 1, 45, 6);
+        notto.play();
+        
+
+		const lotto = {
+			min: 1,
+			max: 45,
+			nums: [],
+			pick: 6,
+			multinumbers: [],
+			setter: function() {
+				for ( i=0; i<this.max; i++ ) {
+					this.nums[i] = i + 1;
+					
+				}
+			},
+			picker: function(repeat) {
+				this.setter();
+				var nums    = this.nums;
+				var numBoard = nums;
+				var pickNum;
+				var numbers = [];
+				var multinumbers = [];
+				for( rep=0; rep<repeat; rep++ ) {
+					this.setter();
+					for( i=0; i<this.pick; i++ ) {
+						while( isNaN(numBoard[pickNum]) || numBoard[pickNum] == 0 ) {
+							pickNum = parseInt(Math.random() * this.max);
+						}
+						numbers[i] = numBoard[pickNum];
+						numBoard.splice(pickNum, 1, 0);
+						numbers.sort(function(a, b) {
+							return a - b;
+						});
+						pickNum = null;
+					}
+					numBoard = nums;
+					multinumbers[rep] = numbers;
+					numbers = [];
+				}
+				this.multinumbers = multinumbers;
+			}
+		}
+
+		document.querySelector('#selector').addEventListener('change', function() {
+			var thisValue   = this.value;
+			var items       = "";
+			lotto.picker(thisValue);
+
+			for( numSet=0; numSet<lotto.multinumbers.length; numSet++ ) {
+				items +='<li>';
+				for( numData=0; numData<lotto.multinumbers[numSet].length; numData++ ) {
+					var thisNum = lotto.multinumbers[numSet][numData];
+					if ( thisNum > 0 && thisNum <= 10 ) {
+						items += "<span class='yellow'>"+thisNum+"</span>";
+					} else if ( thisNum > 10 && thisNum <=20 ) {
+						items += "<span class='blue'>"+thisNum+"</span>";
+					} else if ( thisNum > 20 && thisNum <=30 ) {
+						items += "<span class='red'>"+thisNum+"</span>";
+					} else if ( thisNum > 30 && thisNum <=40 ) {
+						items += "<span class='black'>"+thisNum+"</span>";
+					} else if ( thisNum > 40 && thisNum <=45 ) {
+						items += "<span class='green'>"+thisNum+"</span>";
+					}
+					
+					document.querySelector('.view_list').innerHTML=items;
+				}
+				items +='</li>';
+			}
+			
+		});
+		
+		function refresh() {
+			location.reload(true);
+		}
+	</script>
+	
+</body>
+</html>
