@@ -3,138 +3,170 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<title>로또생성기 v1.0</title>
+	<title>LOTTO PICKER 2.0</title>
 	<style>
-		* { margin: 0; padding: 0; }
+		* { color: #56555c; margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; }
 		a { text-decoration: none; }
 		ul, ol { list-style: none; }
-		select { min-width: 70px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; box-shadow: 0 0 3px 0 #e7eaec; }
+		select { min-width: 100px; height: 30px; vertical-align: middle; font-weight: bold; color: #fff; padding: 3px 5px 0; border: 2px solid #fff; border-width: 0 0 2px; background: transparent; }
 		select option { font-size: 15px; }
-		button { min-width: 60px; height: 30px; vertical-align: middle; padding: 0 5px; border: 1px solid #bbb; border-radius: 3px; background: #f8f8fb; box-shadow: 0 0 3px 0 #e7eaec; }
+		button { min-width: 80px; height: 30px; vertical-align: middle; font-weight: bold; color: #fff; padding: 0 5px 2px; border: 2px solid #fff; background: transparent; }
+        button#btn_generate { margin-right: 30px; }
+        button#btn_init { }
 		
-		#container { max-width: 400px; padding: 20px; }
+        #container { padding-top: 100px; }
+        #header { width: 100%; height: 100px; position: fixed; left: 0; top: 0; background: rgba(102, 205, 171, 1); }
+		#lottoBox { max-width: 400px; max-height: calc(100% - 100px); padding: 0 20px; margin: 0 auto; overflow-y: auto; }
 		
-		.select_box { text-align: center; padding: 10px 15px; border: 2px solid #e7eaec; }
-		.select_box .title { display: inline-block; vertical-align: middle; font-size: 16px; font-weight: bolder; color: #666; margin-right: 10px; }
+		.select_box { text-align: center; padding: 10px 15px; }
+		.select_box .title { display: block; vertical-align: middle; letter-spacing: 1px; font-size: 22px; font-weight: bold; color: #fff; margin-bottom: 15px; }
 		
-		.view_list { padding: 10px 0; }
-		.view_list > li { text-align: center; padding: 10px 0; border-bottom: 1px solid #e7eaec; }
-		.view_list > li span { width: 40px; height: 40px; display: inline-block; vertical-align: middle; text-align: center; font-size: 16px; font-weight: bolder; color: #333; line-height: 40px; margin: 2px; border: 3px solid; border-radius: 100%; }
-		.view_list > li span.yellow { border-color: #ffb400; }
-		.view_list > li span.blue { border-color: #1E90FF; }
-		.view_list > li span.red { border-color: #FF5675; }
-		.view_list > li span.black{ border-color: #828282; }
-		.view_list > li span.green { border-color: #64CD3C; }
+		#view_list { padding: 10px 0; }
+		#view_list > li { text-align: center; padding: 10px 0; border-bottom: 1px solid #e7eaec; }
+		#view_list > li span { width: 40px; height: 40px; display: inline-block; vertical-align: middle; text-align: center; font-size: 16px; font-weight: bolder; color: #333; line-height: 34px; margin: 2px; border: 3px solid; border-radius: 100%; }
+		#view_list > li span.yellow { border-color: #ffb400; }
+		#view_list > li span.blue { border-color: #1E90FF; }
+		#view_list > li span.red { border-color: #FF5675; }
+		#view_list > li span.black{ border-color: #828282; }
+		#view_list > li span.green { border-color: #64CD3C; }
 	</style>
 </head>
 <body>
-	<div id="container">
-		<div class="select_box">
-			<span class="title">몇개를 만들까요?</span>
-			<select name="" id="selector">
-				<option value="0" selected>수량</option>
-				<option value="1">1</option>
-				<option value="2">2</option>
-				<option value="3">3</option>
-				<option value="4">4</option>
-				<option value="5">5</option>
-				<option value="6">6</option>
-				<option value="7">7</option>
-				<option value="8">8</option>
-				<option value="9">9</option>
-				<option value="10">10</option>
-			</select>
-			<button class="btn_refresh" onclick="refresh();">초기화</button>
-		</div>
-		<ul class="view_list">
-		</ul>
-	</div>
-	
-	
-	
-	<div></div>
-	<div></div>
-	<div></div>
+    <div id="container">
+        <div id="header">
+            <div class="select_box">
+                <span class="title">LOTTO PICKER 2.0</span>
+                <select name="" id="select">
+                    <option value="0" selected>수량</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+                <button id="btn_generate">생성</button>
+                <button id="btn_init">초기화</button>
+            </div>
+        </div>
+        <div id="lottoBox">
+            <ul id="view_list">
+            </ul>
+        </div>
+    </div>
 	<script>
-		const Ethtto = function (gameAmount) {
+		const Lotto = function () {
 
-		    this.endNum = 45;
-		    this.numbersPerGame = 6;
-		    this.gameAmount = gameAmount;
-		    this.pickedGame = new Array;
+		    this.endNum;
+		    this.numbersPerGame;
+		    this.gameAmount;
 
 		    this.makeNumber = () => {
+                let pickedGame = new Array();
+                for (i=0; i < this.gameAmount; i++) {
+                    let picked = new Array;
 
-			for (i=0; i < gameAmount; i++) {
-			    let picked = new Array;
+                    while (picked.length < this.numbersPerGame) {
+                        let pick = Math.ceil(Math.random() * this.endNum);
+                        if (!picked.length) {
+                            picked.push(pick);
+                        }
+                        for (n=0; n < picked.length; n++) {
+                            if (picked[n] == pick) {   
+                                break;
+                            }
+                            if (n == picked.length - 1) {
+                                picked.push(pick);
+                            }
+                        }
+                    }
 
-			    while (picked.length < this.numbersPerGame) {
-				let pick = Math.ceil(Math.random() * this.endNum);
-				if (!picked.length) {
-				    picked.push(pick);
-				}
-				for (n=0; n < picked.length; n++) {
-				    if (picked[n] == pick) {   
-					break;
-				    }
-				    if (n == picked.length - 1) {
-					picked.push(pick);
-				    }
-				}
-			    }
+                    picked.sort(function(a, b)  {
+                        return a - b;
+                    });
 
-			    picked.sort(function(a, b)  {
-				return a - b;
-			    });
-
-			    for (k=0; k < picked.length; k++) {
-				if (k > 0) {
-				    if (picked[k] == picked[k - 1]) {   
-					break;
-				    }
-				}
-			    }
-
-			    this.pickedGame.push(picked);
-			}
-
-			return this.pickedGame;
+                    for (k=0; k < picked.length; k++) {
+                        if (k > 0) {
+                            if (picked[k] == picked[k - 1]) {   
+                            break;
+                            }
+                        }
+                    }
+                    pickedGame.push(picked);
+                }
+                return pickedGame;
 		    }
-		}
-		
-		document.querySelector('#selector').addEventListener('change', function() {
-			var thisValue = this.value;
-			var items = "";
-			
-			let ethtto = new Ethtto(thisValue);
-			ethtto.makeNumber();
 
-			for( numSet=0; numSet<ethtto.pickedGame.length; numSet++ ) {
-				items +='<li>';
-				for( numData=0; numData<ethtto.pickedGame[numSet].length; numData++ ) {
-					var thisNum = ethtto.pickedGame[numSet][numData];
-					if ( thisNum > 0 && thisNum <= 10 ) {
-						items += "<span class='yellow'>"+thisNum+"</span>";
-					} else if ( thisNum > 10 && thisNum <=20 ) {
-						items += "<span class='blue'>"+thisNum+"</span>";
-					} else if ( thisNum > 20 && thisNum <=30 ) {
-						items += "<span class='red'>"+thisNum+"</span>";
-					} else if ( thisNum > 30 && thisNum <=40 ) {
-						items += "<span class='black'>"+thisNum+"</span>";
-					} else if ( thisNum > 40 && thisNum <=45 ) {
-						items += "<span class='green'>"+thisNum+"</span>";
-					}
-					
-					document.querySelector('.view_list').innerHTML=items;
-				}
-				items +='</li>';
-			}
-			
-		});
-		
-		function refresh() {
-			location.reload(true);
+            this.draw = ()  => {
+                if (this.gameAmount == 0) {
+                    alert("수량을 선택하세요");
+                    return;
+                }
+                const pickedGame = this.makeNumber();
+
+                let items = "";
+                for (numSet = 0; numSet < pickedGame.length; numSet ++) {
+                    items +='<li>';
+                    for(numData = 0; numData < pickedGame[numSet].length; numData ++) {
+                        const thisNum = pickedGame[numSet][numData];
+                        if ( thisNum > 0 && thisNum <= 10 ) {
+                            items += "<span class='yellow'>"+thisNum+"</span>";
+                        } else if ( thisNum > 10 && thisNum <=20 ) {
+                            items += "<span class='blue'>"+thisNum+"</span>";
+                        } else if ( thisNum > 20 && thisNum <=30 ) {
+                            items += "<span class='red'>"+thisNum+"</span>";
+                        } else if ( thisNum > 30 && thisNum <=40 ) {
+                            items += "<span class='black'>"+thisNum+"</span>";
+                        } else if ( thisNum > 40 && thisNum <=45 ) {
+                            items += "<span class='green'>"+thisNum+"</span>";
+                        }
+                        
+                        document.querySelector('#view_list').innerHTML = items;
+                    }
+                    items +='</li>';
+                }
+            }
+
+            this.addEventListener = () => {
+                const thisObject = this;
+                const selectBox = document.querySelector('#select');
+                selectBox.addEventListener('change', function() {
+                    thisObject.gameAmount = selectBox.value;
+                });
+
+                document.querySelector("#btn_generate").addEventListener("click", () => {
+                    this.draw();
+                });
+
+                document.querySelector("#btn_init").addEventListener("click", () => {
+                    this.init();
+                });
+            }
+
+            this.init = () => {
+                this.endNum = 45;
+                this.numbersPerGame = 6;
+                this.gameAmount = 0;
+
+                document.querySelector('#select').value = 0;
+                document.querySelector('#view_list').innerHTML = "";
+            }
+            
+            this.init();
+            this.addEventListener();
+
+            return this;
 		}
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const lotto = new Lotto();
+        });
+		
 	</script>
 	
 </body>
