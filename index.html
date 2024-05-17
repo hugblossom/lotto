@@ -165,6 +165,12 @@
         
         document.addEventListener("DOMContentLoaded", () => {
             const lotto = new Lotto();
+            const select = document.querySelector('#select');
+            select.value = 5;
+
+            document.querySelector('#select option').forEach(option => {
+                if (option.getAttribute("value") == select.value) option.selected = true;
+            })
         });
 		
 	</script>
