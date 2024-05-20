@@ -167,9 +167,10 @@
             const lotto = new Lotto();
             const select = document.querySelector('#select');
             select.value = 5;
-
+            lotto.gameAmount = select.value;
             document.querySelector('#select option').forEach(option => {
-                if (option.getAttribute("value") == select.value) option.selected = true;
+                if (option.getAttribute("value") == select.value) option.selected = "selected";
+                
             })
         });
 		
